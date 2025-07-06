@@ -1,11 +1,28 @@
 
-from fastapi import FastAPI,Request,HTTPException,Response
+from fastapi import FastAPI,Request,HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import requests
 import random
 
 
 
 app = FastAPI()
+origins = [
+    # разрешенные источники
+    "http://localhost:3000",
+    "http://localhost:8000",
+]
+
+app.add_middleware(
+    # сначапо все запрещаем    
+    CORSMiddleware,
+    # потом начинаем разрешать необходимое
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 def get_user_info(token):
    session = requests.Session()
@@ -42,7 +59,7 @@ def reports(request: Request):
     user_info['roles']=['prothetic_user','test'] #
 
     if 'prothetic_user' in user_info['roles']:
-      report = [[random.randrange(1,1000,1)] * 10000 for i in range(10)]
+      report = [[random.randrange(1,1000,1)] * 100 for i in range(1000)]
       return {"report": report}
     else:
        raise HTTPException(status_code=401, detail="you don't have access")
